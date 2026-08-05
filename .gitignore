@@ -1,1 +1,55 @@
+# --- Secrets & Environment Variables ---
 .env
+.env.local
+.env.*.local
+secrets.json
+credentials.json
+
+# --- Virtual Environments ---
+venv/
+env/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# --- Python Cache & Bytecode ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# --- Jupyter Notebooks ---
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# --- Uploaded / Temp Files ---
+uploads/
+temp/
+tmp/
+*.pdf
+*.docx
+*.doc
+
+# --- Streamlit ---
+.streamlit/secrets.toml
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+
+# --- IDE & Editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Build ---
+build/
+dist/
+*.egg-info/
