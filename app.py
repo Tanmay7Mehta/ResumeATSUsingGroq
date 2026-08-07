@@ -1,44 +1,34 @@
 from dotenv import load_dotenv
 import streamlit as st
-import base64
 import os
-import io
-import fitz  # PyMuPDF - no system dependencies needed
-from google import genai
-from google.genai import types
+import fitz
+from groq import Groq
 
-load_dotenv()  # loads GOOGLE_API_KEY from .env file
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+load_dotenv()
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def get_gemini_response(input_prompt, pdf_content, job_desc):
-    image_part = types.Part.from_bytes(
-        data=base64.b64decode(pdf_content[0]["data"]),
-        mime_type="image/jpeg"
-    )
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=[input_prompt, image_part, job_desc]
-    )
-    return response.text
-
-def input_pdf_setup(uploaded_file):
-    if uploaded_file is not None:
-        # Open PDF from bytes using PyMuPDF (no poppler needed)
-        pdf_document = fitz.open(stream=uploaded_file.read(), filetype="pdf")
-        first_page = pdf_document[0]
-        pix = first_page.get_pixmap(dpi=200)
-        img_bytes = pix.tobytes("jpeg")
-
-        pdf_parts = [
+def get_response(input_prompt, resume_text, job_desc):
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
             {
-                "mime_type": "image/jpeg",
-                "data": base64.b64encode(img_bytes).decode()
+                "role": "user",
+                "content": input_prompt + "\n\nResume Content:\n" + resume_text + "\n\nJob Description:\n" + job_desc
             }
-        ]
-        return pdf_parts
-        
+        ],
+        max_tokens=2048
+    )
+    return response.choices[0].message.content
+
+def extract_pdf_text(uploaded_file):
+    if uploaded_file is not None:
+        pdf_document = fitz.open(stream=uploaded_file.read(), filetype="pdf")
+        text = ""
+        for page in pdf_document:
+            text += page.get_text()
+        return text
     else:
-        return FileNotFoundError("No file uploaded")
+        raise FileNotFoundError("No file uploaded")
 
 st.set_page_config(page_title="ATS Resume Expert")
 st.header("ATS Tracking System")
@@ -49,37 +39,35 @@ if uploaded_file is not None:
     st.write("PDF Uploaded Successfully")
 
 submit1 = st.button("Tell Me About the Resume")
-#submit2 = st.button("How Can I Improvise my Skills")
-#submit3 = st.button("What are the Keywords that are missing")
 submit3 = st.button("Percentage matches")
 
 input_prompt1 = """
 You are an experinced HR with tech experience in the field of any one job role from Data Science, Full stack Web developement, Big Data Engineering, DEVOPS,
-Data Analyst, your task is to review the provided resume against the job description for rhese profiles.
+Data Analyst, your task is to review the provided resume against the job description for these profiles.
 Please share your professional evaluation on whether the candidate's profile aligns with the role.
 Highlight the strengths and weaknesses of the application in relation to the specified job requirements.
 """
 
 input_prompt3 = """
-You are an skilled ATS (Application Tracking System) scanner with deep understanding of any one job role Data Science, Full stack Web developement, Big Data Engineering,
-DEVOPS, Data Analyst and deep ATS dunctionality, your task is to evaluate the resume agains the provided job description. Give me the perecentage of 
-match if the resume matches the job descroption. First the output should come as percentage and then keywords missing and last final thought.
+You are a skilled ATS (Application Tracking System) scanner with deep understanding of any one job role Data Science, Full stack Web developement, Big Data Engineering,
+DEVOPS, Data Analyst and deep ATS functionality, your task is to evaluate the resume against the provided job description. Give me the percentage of 
+match if the resume matches the job description. First the output should come as percentage and then keywords missing and last final thought.
 """
 
 if submit1:
     if uploaded_file is not None:
-        pdf_content = input_pdf_setup(uploaded_file)
-        response = get_gemini_response(input_prompt1, pdf_content, input_text)
-        st.subheader("The Respose is")
+        resume_text = extract_pdf_text(uploaded_file)
+        response = get_response(input_prompt1, resume_text, input_text)
+        st.subheader("The Response is")
         st.write(response)
     else:
         st.write("Please upload the resume")
 
 elif submit3:
     if uploaded_file is not None:
-        pdf_content = input_pdf_setup(uploaded_file)
-        response = get_gemini_response(input_prompt3, pdf_content, input_text)
-        st.subheader("The Respose is")
+        resume_text = extract_pdf_text(uploaded_file)
+        response = get_response(input_prompt3, resume_text, input_text)
+        st.subheader("The Response is")
         st.write(response)
     else:
         st.write("Please upload the resume")
