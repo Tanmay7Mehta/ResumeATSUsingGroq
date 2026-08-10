@@ -29,3 +29,14 @@ def extract_pdf_text(uploaded_file):
         return text
     else:
         raise FileNotFoundError("No file uploaded")
+
+st.set_page_config(page_title="ATS Resume Expert")
+st.header("ATS Tracking System")
+input_text = st.text_area("Job Description: ", key="input")
+uploaded_file = st.file_uploader("Upload your resume(PDF)...", type=["pdf"])
+
+if uploaded_file is not None:
+    st.write("PDF Uploaded Successfully")
+
+submit1 = st.button("Tell me aboout the resume")
+submit2 = st.button("Percentage match")
