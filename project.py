@@ -7,7 +7,7 @@ from groq import Groq
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def gret_response(input_propmt, resume_text, job_des):
+def get_response(input_propmt, resume_text, job_des):
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
@@ -48,8 +48,26 @@ Please share your professional evaluation on whether the candidate's profile ali
 Highlight the strengths and weaknesses of the application in relation to the specified job requirements.
 """
 
-input_prompt3 = """
+input_prompt2 = """
 You are a skilled ATS (Application Tracking System) scanner with deep understanding of any one job role Data Science, Full stack Web developement, Big Data Engineering,
 DEVOPS, Data Analyst and deep ATS functionality, your task is to evaluate the resume against the provided job description. Give me the percentage of 
 match if the resume matches the job description. First the output should come as percentage and then keywords missing and last final thought.
 """
+
+if submit1:
+    if uploaded_file is not None:
+        resume_text = extract_pdf_text(uploaded_file)
+        response = get_response(input_prompt1, resume_text, input_text)
+        st.subheader("The Response is: ")
+        st.write(response)
+    else:
+        st.write("Please upload the resume")
+
+elif submit2:
+    if uploaded_file is not None:
+        reume_text = extract_pdf_text(uploaded_file)
+        response = get_response(input_prompt2, resume_text, input_text)
+        st.subheader("The Response is: ")
+        st.write(response)
+    else:
+        st.write("Please upload the resume")
