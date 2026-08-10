@@ -18,7 +18,7 @@ def get_response(input_propmt, resume_text, job_des):
         ],
         max_tokens=2048
     )
-    return response.choice[0].message.content
+    return response.choices[0].message.content
 
 def extract_pdf_text(uploaded_file):
     if uploaded_file is not None:
@@ -65,7 +65,7 @@ if submit1:
 
 elif submit2:
     if uploaded_file is not None:
-        reume_text = extract_pdf_text(uploaded_file)
+        resume_text = extract_pdf_text(uploaded_file)
         response = get_response(input_prompt2, resume_text, input_text)
         st.subheader("The Response is: ")
         st.write(response)
