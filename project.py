@@ -19,3 +19,13 @@ def gret_response(input_propmt, resume_text, job_des):
         max_tokens=2048
     )
     return response.choice[0].message.content
+
+def extract_pdf_text(uploaded_file):
+    if uploaded_file is not None:
+        pdf_document = fitz.open(stream=uploaded_file.read(), filetype="pdf")
+        text = ""
+        for page in pdf_document:
+            text +=page.get_text()
+        return text
+    else:
+        raise FileNotFoundError("No file uploaded")
