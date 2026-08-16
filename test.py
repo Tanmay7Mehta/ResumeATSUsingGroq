@@ -55,3 +55,20 @@ DEVOPS, Data Analyst and deep ATS functionality, your task is to evaluate the re
 match if the resume matches the job description. First the output should come as percentage and then keywords missing and last final thought.
 """
 
+if submit1:
+    if uploaded_file is not None:
+        resume_text = extract_pdf_text(uploaded_file)
+        response = get_response(input_prompt1, resume_text, input_text)
+        st.subheader("The Response is: ")
+        st.write(response)
+    else:
+        st.write("Please Upload the Resume")
+
+elif submit2:
+    if uploaded_file is not None:
+        resume_text = extract_pdf_text(uploaded_file)
+        response = get_response(input_prompt2, resume_text, input_text)
+        st.subheader("The Response is: ")
+        st.write(response)
+    else:
+        st.write("Please Upload the Resume")
